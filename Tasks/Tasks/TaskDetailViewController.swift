@@ -14,6 +14,7 @@ class TaskDetailViewController: UIViewController {
     
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var notesTextView: UITextView!
+    @IBOutlet weak var priorityControl: UISegmentedControl!
     
     // MARK: - Properties
     
@@ -37,15 +38,19 @@ class TaskDetailViewController: UIViewController {
         guard !name.isEmpty else { return }
 
         let notes = notesTextView.text
-
+        
+        //collect the appropiate priority
+        let priorityIndex = priorityControl.selectedSegmentIndex
+        let priority = TaskPriority.allPriorites[priorityIndex]
         if let task = task {
             //Editing an existing task
             task.name = name
             task.notes = notes
+            task.priority = priority.rawValue
         }
         else {
             //Creating new tasks
-            let _ = Task(name: name, notes: notes)
+            let _ = Task(name: name, notes: notes, priority: priority)
         }
 
         //Save change
@@ -66,6 +71,16 @@ class TaskDetailViewController: UIViewController {
         title = task?.name ?? "Create Task"
         nameTextField.text = task?.name
         notesTextView.text = task?.notes
+        //read prioity from task and assign it to the segmented control
+        let priority: TaskPriority
+        if let taskPriority = task?.priority {
+            priority = TaskPriority(rawValue: taskPriority)!
+        }
+        else {
+            priority = .normal
+        }
+        
+        priorityControl.selectedSegmentIndex = TaskPriority.allPriorites.firstIndex(of: priority) ?? 1
     }
     
 }
